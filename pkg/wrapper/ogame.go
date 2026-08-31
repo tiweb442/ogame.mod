@@ -2934,12 +2934,43 @@ func (b *OGame) getFacilities(celestialID ogame.CelestialID, options ...Option) 
 }
 
 func (b *OGame) getTechs(celestialID ogame.CelestialID) (ogame.Techs, error) {
-	vals := url.Values{"page": {FetchTechsName}}
-	page, err := getAjaxPage[parser.FetchTechsAjaxPage](b, vals, ChangePlanet(celestialID))
+	supplies, err := b.getResourcesBuildings(celestialID)
 	if err != nil {
 		return ogame.Techs{}, err
 	}
-	return page.ExtractTechs()
+	facilities, err := b.getFacilities(celestialID)
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	ships, err := b.getShips(celestialID)
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	defenses, err := b.getDefense(celestialID)
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	researches, err := b.getResearch()
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	lfBuildings, err := b.getLfBuildings(celestialID)
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	lfResearches, err := b.getLfResearch(celestialID)
+	if err != nil {
+		return ogame.Techs{}, err
+	}
+	return ogame.Techs{
+		ResourcesBuildings: supplies,
+		Facilities:         facilities,
+		ShipsInfos:         ships,
+		DefensesInfos:      defenses,
+		Researches:         researches,
+		LfBuildings:        lfBuildings,
+		LfResearches:       lfResearches,
+	}, nil
 }
 
 func (b *OGame) getProduction(celestialID ogame.CelestialID) ([]ogame.Quantifiable, int64, error) {
